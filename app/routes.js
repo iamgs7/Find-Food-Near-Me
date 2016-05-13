@@ -106,6 +106,22 @@ module.exports = function(app, passport) {
             });
     });
 
+    app.get('/findHangout', function(req, res) {
+        var cityName = req.query.cityName;
+        console.log(cityName);
+        yelp.search({
+            term: "food",
+            //bounds: swLat + "," + swLong + "|" + neLat + "," + neLong
+            location: cityName
+        })
+            .then(function(data) {
+                res.json(data);
+            })
+            .catch(function(err) {
+                console.log(err);
+            });
+    });
+
     app.post('/review', function(req, res) {
         var tempReview = new reviews({
             restaurant: req.body.restaurant,

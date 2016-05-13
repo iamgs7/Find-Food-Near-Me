@@ -1,52 +1,88 @@
-function initMap() {
-    var map = new google.maps.Map(document.getElementById('map'), {
-        center: {
-            lat: -33.8688,
-            lng: 151.2195
+var userCurrent,
+count = 0,
+hopCity = [],
+hopRest = [],
+finalHopList = [];
+$(document).ready(function() {
+    init();
+});
+
+function init() {
+    var cities = ['San-Francisco', 'San-Diego', 'Fullerton', 'Los-Angeles', 'Anaheim', 'San Jose', 'Monterey', 'Palo-Alto', 'Long Beach', 'Santa Monica', 'Sacramento'];
+    cities = cities.sort();
+    var output = "";
+    for (x in cities) {
+        output += "<a onclick=\"getCityRests('"+ cities[x] +"')\"class=\"chip\">" +
+            cities[x] +
+            "</a>&nbsp;&nbsp;&nbsp;"
+    }
+    $('#cities').append(output);
+}
+
+var vm = {
+    searchResults: ko.observableArray()
+};
+/*var clickToAdd = {
+  addToList: function(data, event){
+    console.log('hi' + data + "\n" + event);
+  }
+};*/
+ko.applyBindings(vm);
+
+
+function getCityRests(cityName) {
+  $('#modal_citySelect').closeModal();
+  count = 1;
+  hopCity.push(cityName);
+  vm.searchResults.removeAll();
+  console.log('You will get ' + cityName);
+  //Fetch restaurants nearby
+    $.ajax({
+        url: '/findHangout',
+        dataType: "json",
+        data: {
+            "cityName": cityName
         },
-        zoom: 13
-    });
-    var input = document.getElementById('pac-input');
-    var autocomplete = new google.maps.places.Autocomplete(input);
-    autocomplete.bindTo('bounds', map);
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-    var infowindow = new google.maps.InfoWindow();
-    var marker = new google.maps.Marker({
-        map: map
-    });
-    marker.addListener('click', function() {
-        infowindow.open(map, marker);
-    });
-    autocomplete.addListener('place_changed', function() {
-        infowindow.close();
-        var place = autocomplete.getPlace();
-        console.log(((place.formatted_address).split(","))[0]);
-        if (!place.geometry) {
-            return;
+        type: 'GET',
+        success: function(data) {
+            //console.log(data);
+            data.businesses.forEach(function(business) {
+                //console.log(business);
+                business.newID = business.id + "123";
+                business.newIDlink = "#" + business.newID;
+                vm.searchResults.push(business);
+                var restaurant = business.name;
+            });
+            $('#findList').hide();
+            $('#findList').fadeIn(3000);
+            $('textarea').characterCounter();
+            $('select').material_select();
+            $(".userReview").hide();
+            $('.modal-trigger').leanModal();
+        },
+        error: function(xhr, status, error) {
+            console.log("Restaurant search failed");
         }
-        if (place.geometry.viewport) {
-            map.fitBounds(place.geometry.viewport);
-        } else {
-            map.setCenter(place.geometry.location);
-            map.setZoom(17);
-        }
-        // Set the position of the marker using the place ID and location.
-        marker.setPlace({
-            placeId: place.place_id,
-            location: place.geometry.location
-        });
-        marker.setVisible(true);
-        infowindow.setContent('<div><strong>' + place.name + '</strong><br>' +
-            'Place ID: ' + place.place_id + '<br>' +
-            place.formatted_address);
-        infowindow.open(map, marker);
     });
 }
 
-$(document).ready(function() {
+function addRestToList(data, event) {
+  hopRest.push(data);
+  console.log(data);
+}
 
-});
-
-$('#makeTrip').click(function(e) {
-    initMap();
+$('#selector').click(function(e){
+  var hopTemp = "";
+  if(count > 0){
+    for(x in hopRest){
+      hopTemp += hopRest[x];
+    }
+    var temp = {
+      "city": hopCity[0],
+      "restaurants": hopTemp
+    }  
+    finalHopList.push(temp);
+    console.log(finalHopList[0]);
+  }
+  
 });
