@@ -24,6 +24,7 @@ ko.applyBindings(vm);
 
 function getCityRests(cityName) {
     $('#modal_citySelect').closeModal();
+    Materialize.toast('Searching Restaurants in ' + cityName, 4000);
     count = 1;
     hopCity.push(cityName);
     vm.searchResults.removeAll();
@@ -59,6 +60,7 @@ function getCityRests(cityName) {
 }
 
 function addRestToList(data, event) {
+    Materialize.toast('Adding ' + data + ' to your plan', 4000);
     hopRest.push(data);
 }
 
@@ -103,6 +105,7 @@ function saveToDb() {
 }
 
 $('#saveList').click(function(e) {
+    Materialize.toast('Saving your plan to database', 4000);
     $.when(createHopList()).then(saveToDb());
     //saveToDb();
 });
