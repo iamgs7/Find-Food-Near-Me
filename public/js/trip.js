@@ -1,18 +1,15 @@
 var userCurrent,
-count = 0,
-hopCity = [],
-hopRest = [],
-finalHopList = [];
-$(document).ready(function() {
-    init();
-});
+    count = 0,
+    hopCity = [],
+    hopRest = [],
+    finalHopList = [];
 
 function init() {
     var cities = ['San-Francisco', 'San-Diego', 'Fullerton', 'Los-Angeles', 'Anaheim', 'San Jose', 'Monterey', 'Palo-Alto', 'Long Beach', 'Santa Monica', 'Sacramento'];
     cities = cities.sort();
     var output = "";
     for (x in cities) {
-        output += "<a onclick=\"getCityRests('"+ cities[x] +"')\"class=\"chip\">" +
+        output += "<a onclick=\"getCityRests('" + cities[x] + "')\"class=\"chip\">" +
             cities[x] +
             "</a>&nbsp;&nbsp;&nbsp;"
     }
@@ -22,21 +19,16 @@ function init() {
 var vm = {
     searchResults: ko.observableArray()
 };
-/*var clickToAdd = {
-  addToList: function(data, event){
-    console.log('hi' + data + "\n" + event);
-  }
-};*/
 ko.applyBindings(vm);
 
 
 function getCityRests(cityName) {
-  $('#modal_citySelect').closeModal();
-  count = 1;
-  hopCity.push(cityName);
-  vm.searchResults.removeAll();
-  console.log('You will get ' + cityName);
-  //Fetch restaurants nearby
+    $('#modal_citySelect').closeModal();
+    count = 1;
+    hopCity.push(cityName);
+    vm.searchResults.removeAll();
+    console.log('You will get ' + cityName);
+    //Fetch restaurants nearby
     $.ajax({
         url: '/findHangout',
         dataType: "json",
@@ -67,22 +59,56 @@ function getCityRests(cityName) {
 }
 
 function addRestToList(data, event) {
-  hopRest.push(data);
-  console.log(data);
+    hopRest.push(data);
 }
 
-$('#selector').click(function(e){
-  var hopTemp = "";
-  if(count > 0){
-    for(x in hopRest){
-      hopTemp += hopRest[x];
+function createHopList() {
+    var hopTemp = "";
+    if (count > 0) {
+        for (x in hopRest) {
+            hopTemp += ", " + hopRest[x];
+        }
+        hopTemp = hopTemp.substring(2);
+        var temp = {
+            "city": hopCity[0],
+            "restaurants": hopTemp
+        }
+        finalHopList.push(temp);
+        hopRest = [];
+        hopCity = [];
+        console.log(JSON.stringify(finalHopList));
+    } else {
+        console.log('Error');
     }
-    var temp = {
-      "city": hopCity[0],
-      "restaurants": hopTemp
-    }  
-    finalHopList.push(temp);
-    console.log(finalHopList[0]);
-  }
-  
+}
+
+function saveToDb() {
+    typeof JSON.stringify(finalHopList);
+  $.ajax({
+      url: '/saveListToDb',
+      dataType: 'json',
+      contentType: 'application/json',
+      data:JSON.stringify({
+        "user": userCurrent,
+        "hangoutList": finalHopList
+      }),
+      type: 'POST',
+      success:function(data){
+        console.log('Successfully Saved List');
+      },
+      error: function(error) {
+        console.log('Error: ' + error);
+      }
+  });
+}
+
+$('#saveList').click(function(e) {
+    $.when(createHopList()).then(saveToDb());
+    //saveToDb();
+});
+
+$(document).ready(function() {
+    init();
+    userCurrent = $('#userCurrent').text();
+    console.log(userCurrent);
 });

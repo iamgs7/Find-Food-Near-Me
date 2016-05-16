@@ -7,6 +7,7 @@ module.exports = function(app, passport) {
     var configAuth = require('../config/auth');
     var yelp = new Yelp(configAuth.yelp);
     var reviews = require('../app/models/review');
+    var hangouts = require('../app/models/hangout');
 
     // normal routes ===============================================================
     // show the home page (will also have our login links)
@@ -108,7 +109,6 @@ module.exports = function(app, passport) {
 
     app.get('/findHangout', function(req, res) {
         var cityName = req.query.cityName;
-        console.log(cityName);
         yelp.search({
             term: "food",
             //bounds: swLat + "," + swLong + "|" + neLat + "," + neLong
@@ -120,6 +120,20 @@ module.exports = function(app, passport) {
             .catch(function(err) {
                 console.log(err);
             });
+    });
+
+    app.post('/saveListToDb', function(req, res) {
+        var plan = new hangouts({
+            user: req.body.user,
+            plans: req.body.hangoutList
+        });
+        plan.save(function(err, plan) {
+            if (err) {
+                return console.log(err);
+            }
+            console.log("Plan Saved");
+            res.json(plan);
+        });
     });
 
     app.post('/review', function(req, res) {
