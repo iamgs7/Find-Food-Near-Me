@@ -8,10 +8,10 @@ function init() {
     var cities = ['San-Francisco', 'San-Diego', 'Fullerton', 'Los-Angeles', 'Anaheim', 'San Jose', 'Monterey', 'Palo-Alto', 'Long Beach', 'Santa Monica', 'Sacramento'];
     cities = cities.sort();
     var output = "";
-    for (x in cities) {
+    for (var x in cities) {
         output += "<a onclick=\"getCityRests('" + cities[x] + "')\"class=\"chip\">" +
             cities[x] +
-            "</a>&nbsp;&nbsp;&nbsp;"
+            "</a>&nbsp;&nbsp;&nbsp;";
     }
     $('#cities').append(output);
 }
@@ -67,14 +67,14 @@ function addRestToList(data, event) {
 function createHopList() {
     var hopTemp = "";
     if (count > 0) {
-        for (x in hopRest) {
+        for (var x in hopRest) {
             hopTemp += ", " + hopRest[x];
         }
         hopTemp = hopTemp.substring(2);
         var temp = {
             "city": hopCity[0],
             "restaurants": hopTemp
-        }
+        };
         finalHopList.push(temp);
         hopRest = [];
         hopCity = [];
@@ -85,23 +85,22 @@ function createHopList() {
 }
 
 function saveToDb() {
-    typeof JSON.stringify(finalHopList);
-  $.ajax({
-      url: '/saveListToDb',
-      dataType: 'json',
-      contentType: 'application/json',
-      data:JSON.stringify({
-        "user": userCurrent,
-        "hangoutList": finalHopList
-      }),
-      type: 'POST',
-      success:function(data){
-        console.log('Successfully Saved List');
-      },
-      error: function(error) {
-        console.log('Error: ' + error);
-      }
-  });
+    $.ajax({
+        url: '/saveListToDb',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "user": userCurrent,
+            "hangoutList": finalHopList
+        }),
+        type: 'POST',
+        success: function(data) {
+            console.log('Successfully Saved List');
+        },
+        error: function(error) {
+            console.log('Error: ' + error);
+        }
+    });
 }
 
 $('#saveList').click(function(e) {

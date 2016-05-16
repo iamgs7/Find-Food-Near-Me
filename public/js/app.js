@@ -1,10 +1,9 @@
-"use strict";
 var file_path,
     userCurrent;
 $(document).ready(function() {
     $('.modal-trigger').leanModal({
         dismissible: true, // Modal can be dismissed by clicking outside of the modal
-        opacity: .5, // Opacity of modal background
+        opacity: 0.5, // Opacity of modal background
         in_duration: 300, // Transition in duration
         out_duration: 200
     });
@@ -28,8 +27,8 @@ function getLocation() {
 function showPosition(position) {
     var lat = position.coords.latitude;
     var lon = position.coords.longitude;
-    var latlon = new google.maps.LatLng(lat, lon)
-    var mapholder = document.getElementById('mapholder')
+    var latlon = new google.maps.LatLng(lat, lon);
+    var mapholder = document.getElementById('mapholder');
     mapholder.style.height = '250px';
     mapholder.style.width = '500px';
 
@@ -41,7 +40,7 @@ function showPosition(position) {
         navigationControlOptions: {
             style: google.maps.NavigationControlStyle.SMALL
         }
-    }
+    };
 
     var map = new google.maps.Map(document.getElementById("mapholder"), myOptions);
     var marker = new google.maps.Marker({

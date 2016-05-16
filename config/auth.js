@@ -5,4 +5,4 @@ module.exports = {
         "token": "iwd171pcfzkoUB4reb7CYD6fDPsFG9CI",
         "token_secret": "113LEtBcwCcKuCtD9m2U3Q9XrkA",
     }
-}
+};
